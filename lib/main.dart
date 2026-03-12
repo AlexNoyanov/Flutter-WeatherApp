@@ -144,12 +144,6 @@ class _MyHomePageState extends State<MyHomePage> {
       // _loadingState();
       return Scaffold(
         backgroundColor: AppColors.deepSpace,
-        // appBar: AppBar(
-        //   backgroundColor: Theme.of(context).colorScheme.onPrimary,
-        //   title: const Center(child: Text('Weather App')),
-        //   leading: const Icon(Icons.more_vert),
-        //   actions: const [Icon(Icons.add)],
-        // ),
         body: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -165,37 +159,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       backgroundColor: AppColors.deepSpace,
-      // appBar: AppBar(
-      //   backgroundColor: Theme.of(context).colorScheme.onPrimary,
-      //   title: Center(
-      //     child: Column(
-      //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      //       children: [
-      //         Row(
-      //           mainAxisAlignment: MainAxisAlignment.center,
-      //           children: [
-      //             const Icon(Icons.location_on),
-      //             Text(_fullWeatherData?.locationName ?? 'Unknown'),
-      //           ],
-      //         ),
-      //         Row(
-      //           mainAxisAlignment: MainAxisAlignment.center,
-      //           children: [
-      //             Text(
-      //               _getFormattedDate(),
-      //               style: TextStyle(
-      //                 color: Colors.black.withOpacity(0.6),
-      //                 fontSize: 15,
-      //               ),
-      //             ),
-      //           ],
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      //   leading: const Icon(Icons.more_vert),
-      //   actions: const [Icon(Icons.add)],
-      // ),
       appBar: AppBar(backgroundColor: AppColors.deepSpace),
       body: Container(
         width: double.infinity,
@@ -256,111 +219,138 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     child: Row(
                       children: [
-                        Text(
-                          _fullWeatherData != null
-                              ? '${_fullWeatherData!.temperature.toStringAsFixed(1)}°'
-                              : '7.5°',
-                          style: TextStyle(
-                            fontSize: 78,
-                            fontWeight: FontWeight.w500, // Medium weight (500)
-                            fontFamily:
-                                'SpaceGrotesk', // Must add to pubspec.yaml
-                            height: 1.0, // line-height: 1
-                            letterSpacing: -4.0, // -4px letter spacing
-                            foreground: Paint()
-                              ..shader =
-                                  LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: const [
-                                      Color(0xFFFFFFFF), // White
-                                      Color(0xFFB8CCF0), // Soft blue
-                                    ],
-                                    stops: const [
-                                      0.3,
-                                      1.0,
-                                    ], // 30% white, 100% blue
-                                  ).createShader(
-                                    const Rect.fromLTWH(0, 0, 200, 100),
-                                  ),
-                          ),
-                        ),
-                        Container(
-                          height: 80,
-                          // width: 120, // Remove fixed width - let it size to content
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 28,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(
-                              0xFF121820,
-                            ).withOpacity(0.75), // Card Dark with 75% opacity
-                            borderRadius: BorderRadius.circular(40.0),
-                            border: Border.all(
-                              color: const Color(0xFF58C4FF).withOpacity(
-                                0.25,
-                              ), // Bright blue with 25% opacity
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(
-                                  0xFF002864,
-                                ).withOpacity(0.5), // Dark blue shadow
-                                offset: const Offset(0, 8),
-                                blurRadius: 12,
-                                spreadRadius:
-                                    -8, // Negative spread = smaller shadow
+                        Row(
+                          children: [
+                            Text(
+                              _fullWeatherData != null
+                                  ? '${_fullWeatherData!.temperature.toStringAsFixed(1)}°'
+                                  : '7.5',
+                              style: TextStyle(
+                                fontSize: 78,
+                                fontWeight:
+                                    FontWeight.w500, // Medium weight (500)
+                                fontFamily:
+                                    'SpaceGrotesk', // Must add to pubspec.yaml
+                                height: 1.0, // line-height: 1
+                                letterSpacing: -4.0, // -4px letter spacing
+                                foreground: Paint()
+                                  ..shader =
+                                      LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: const [
+                                          Color(0xFFFFFFFF), // White
+                                          Color(0xFFB8CCF0), // Soft blue
+                                        ],
+                                        stops: const [
+                                          0.3,
+                                          1.0,
+                                        ], // 30% white, 100% blue
+                                      ).createShader(
+                                        const Rect.fromLTWH(0, 0, 200, 100),
+                                      ),
                               ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize:
-                                MainAxisSize.min, // Shrink to fit content
-                            children: [
-                              const Text('☁️', style: TextStyle(fontSize: 24)),
-                              // const SizedBox(width: 8),
-                              Column(
-                                children: [
-                                  Text(
-                                    _fullWeatherData?.weatherDescription ??
-                                        'overcast',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(
-                                        0xFFD6EAFF,
-                                      ), // Light blue white
-                                      fontFamily: 'Inter',
-                                    ),
-                                  ),
-                                  Text(
-                                    _fullWeatherData?.weatherDescription ??
-                                        'clouds',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(
-                                        0xFFD6EAFF,
-                                      ), // Light blue white
-                                      fontFamily: 'Inter',
-                                    ),
+                            ),
+                            Text(
+                              '°C',
+                              style: TextStyle(
+                                fontSize: 40,
+                                fontWeight:
+                                    FontWeight.w500, // Medium weight (500)
+                                fontFamily:
+                                    'SpaceGrotesk', // Must add to pubspec.yaml
+                                height: 1.0, // line-height: 1
+                                letterSpacing: -4.0, // -4px letter spacing
+                                foreground: Paint()
+                                  ..shader =
+                                      LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: const [
+                                          Color(0xFFFFFFFF), // White
+                                          Color(0xFFB8CCF0), // Soft blue
+                                        ],
+                                        stops: const [
+                                          0.3,
+                                          1.0,
+                                        ], // 30% white, 100% blue
+                                      ).createShader(
+                                        const Rect.fromLTWH(0, 0, 200, 100),
+                                      ),
+                              ),
+                            ),
+                            Container(
+                              height: 80,
+                              // width: 120, // Remove fixed width - let it size to content
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 28,
+                                vertical: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF121820).withOpacity(
+                                  0.75,
+                                ), // Card Dark with 75% opacity
+                                borderRadius: BorderRadius.circular(40.0),
+                                border: Border.all(
+                                  color: const Color(0xFF58C4FF).withOpacity(
+                                    0.25,
+                                  ), // Bright blue with 25% opacity
+                                  width: 1,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFF002864,
+                                    ).withOpacity(0.5), // Dark blue shadow
+                                    offset: const Offset(0, 8),
+                                    blurRadius: 12,
+                                    spreadRadius:
+                                        -8, // Negative spread = smaller shadow
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
+                              child: Row(
+                                mainAxisSize:
+                                    MainAxisSize.min, // Shrink to fit content
+                                children: [
+                                  const Text(
+                                    '☁️',
+                                    style: TextStyle(fontSize: 24),
+                                  ),
+                                  // const SizedBox(width: 8),
+                                  Column(
+                                    children: [
+                                      Text(
+                                        _fullWeatherData?.weatherDescription ??
+                                            'overcast',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(
+                                            0xFFD6EAFF,
+                                          ), // Light blue white
+                                          fontFamily: 'Inter',
+                                        ),
+                                      ),
+                                      Text(
+                                        _fullWeatherData?.weatherDescription ??
+                                            'clouds',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(
+                                            0xFFD6EAFF,
+                                          ), // Light blue white
+                                          fontFamily: 'Inter',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-
-                        // Container(
-                        //   height: 60,
-                        //   width: 120,
-                        //   decoration: BoxDecoration(
-                        //     color: AppColors.steelBlue,
-                        //     borderRadius: BorderRadius.circular(50.0),
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),
@@ -368,7 +358,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Row(
                   children: [
                     _precidWidget('50', 'no rain', '0', 'skyType'),
-                    _humidityWidget('69', '3.2'),
+                    _humidityWidget('69', 3.2),
                   ],
                 ),
               ],
@@ -637,7 +627,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _humidityWidget(humidity, dewPoint) {
+  Widget _humidityWidget(humidity, double dewPoint) {
     return Padding(
       padding: EdgeInsets.all(10.0),
       child: Container(
@@ -676,7 +666,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '💧',
+                    '💨',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
@@ -735,6 +725,45 @@ class _MyHomePageState extends State<MyHomePage> {
                           ],
                           stops: const [0.3, 1.0], // 30% white, 100% blue
                         ).createShader(const Rect.fromLTWH(0, 0, 200, 100)),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              LinearProgressIndicator(
+                value: dewPoint / 10, // Value between 0.0 and 1.0
+              ),
+              Row(
+                children: [
+                  Text(
+                    'dew point ', // Use your dynamic date
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: -0.16,
+                      color: Color(0xFF8A9BB5),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+
+                  Text(
+                    dewPoint.toString(), // Use your dynamic date
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: -0.16,
+                      color: Color(0xFF8A9BB5),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                  Text(
+                    '°', // Use your dynamic date
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: -0.16,
+                      color: Color(0xFF8A9BB5),
+                      fontFamily: 'Inter',
                     ),
                   ),
                 ],

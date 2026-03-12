@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:weather_app/location_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 typedef WeatherData = ({
   double temperature,
@@ -17,7 +18,7 @@ typedef WeatherData = ({
 
 Future<WeatherData> getWeather(double lat, double lon) async {
   print('=== GETTING WEATHER UPDATE ===');
-  final apiKey = 'd9d165819e502ce9b42b7460ac7309fa';
+  final apiKey = dotenv.env['OPENWEATHER_API_KEY'] ?? '';
   final url =
       'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey&units=metric';
 

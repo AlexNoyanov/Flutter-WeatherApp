@@ -36,7 +36,8 @@ typedef WeatherData = ({
 Future<WeatherData> getWeather(double lat, double lon) async {
   print('=== GETTING WEATHER UPDATE ===');
   final apiKey = dotenv.env['OPENWEATHER_API_KEY'] ?? '';
-  final url = dotenv.env['OPENWEATHER_BASE_URL'] ?? '';
+  final baseUrl = dotenv.env['OPENWEATHER_BASE_URL'] ?? '';
+  final url = '$baseUrl?lat=$lat&lon=$lon&appid=$apiKey&units=metric';
 
   final response = await http.get(Uri.parse(url));
   final data = json.decode(response.body);
@@ -56,7 +57,9 @@ Future<WeatherData> getWeather(double lat, double lon) async {
   return weatherData;
 }
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -203,7 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Container(
@@ -225,7 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Text(
                               _fullWeatherData != null
                                   ? '${_fullWeatherData!.temperature.toStringAsFixed(1)}°'
-                                  : '22.5',
+                                  : '...',
                               style: TextStyle(
                                 fontSize: 78,
                                 fontWeight:
@@ -319,32 +322,24 @@ class _MyHomePageState extends State<MyHomePage> {
                                     '☁️',
                                     style: TextStyle(fontSize: 24),
                                   ),
-                                  // const SizedBox(width: 8),
+                                  const SizedBox(width: 8),
                                   Column(
                                     children: [
-                                      Text(
+                                      // Text(
+                                      //   _fullWeatherData?.weatherDescription ??
+                                      //       '...',
+                                      //   style: const TextStyle(
+                                      //     fontSize: 18,
+                                      //     fontWeight: FontWeight.w500,
+                                      //     color: Color(
+                                      //       0xFFD6EAFF,
+                                      //     ), // Light blue white
+                                      //     fontFamily: 'Inter',
+                                      //   ),
+                                      // ),
+                                      _splitedTextColumn(
                                         _fullWeatherData?.weatherDescription ??
-                                            'overcast',
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(
-                                            0xFFD6EAFF,
-                                          ), // Light blue white
-                                          fontFamily: 'Inter',
-                                        ),
-                                      ),
-                                      Text(
-                                        _fullWeatherData?.weatherDescription ??
-                                            'clouds',
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(
-                                            0xFFD6EAFF,
-                                          ), // Light blue white
-                                          fontFamily: 'Inter',
-                                        ),
+                                            '...',
                                       ),
                                     ],
                                   ),
@@ -357,6 +352,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     _precidWidget('50', 'no rain', '0', 'skyType'),
@@ -367,6 +363,27 @@ class _MyHomePageState extends State<MyHomePage> {
             ), // Spacing from top
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _splitedTextColumn(String text) {
+    final List<String> words = text.split(' ');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [for (int i = 0; i < words.length; i++) _textLine(words[i])],
+    );
+  }
+
+  Widget _textLine(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        letterSpacing: -0.16,
+        color: Color(0xFF8A9BB5),
+        fontFamily: 'Inter',
       ),
     );
   }

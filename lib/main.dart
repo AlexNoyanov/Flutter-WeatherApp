@@ -144,12 +144,12 @@ class _MyHomePageState extends State<MyHomePage> {
       // _loadingState();
       return Scaffold(
         backgroundColor: AppColors.deepSpace,
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.onPrimary,
-          title: const Center(child: Text('Weather App')),
-          leading: const Icon(Icons.more_vert),
-          actions: const [Icon(Icons.add)],
-        ),
+        // appBar: AppBar(
+        //   backgroundColor: Theme.of(context).colorScheme.onPrimary,
+        //   title: const Center(child: Text('Weather App')),
+        //   leading: const Icon(Icons.more_vert),
+        //   actions: const [Icon(Icons.add)],
+        // ),
         body: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -164,107 +164,379 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 195, 209, 255),
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.onPrimary,
-        title: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.location_on),
-                  Text(_fullWeatherData?.locationName ?? 'Unknown'),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _getFormattedDate(),
+      backgroundColor: AppColors.deepSpace,
+      // appBar: AppBar(
+      //   backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      //   title: Center(
+      //     child: Column(
+      //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      //       children: [
+      //         Row(
+      //           mainAxisAlignment: MainAxisAlignment.center,
+      //           children: [
+      //             const Icon(Icons.location_on),
+      //             Text(_fullWeatherData?.locationName ?? 'Unknown'),
+      //           ],
+      //         ),
+      //         Row(
+      //           mainAxisAlignment: MainAxisAlignment.center,
+      //           children: [
+      //             Text(
+      //               _getFormattedDate(),
+      //               style: TextStyle(
+      //                 color: Colors.black.withOpacity(0.6),
+      //                 fontSize: 15,
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      //   leading: const Icon(Icons.more_vert),
+      //   actions: const [Icon(Icons.add)],
+      // ),
+      appBar: AppBar(backgroundColor: AppColors.deepSpace),
+      body: Container(
+        width: double.infinity,
+        color: AppColors.deepSpace,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 60),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start, // ← Left align!
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    _fullWeatherData?.locationName ?? 'Kosino',
                     style: TextStyle(
-                      color: Colors.black.withOpacity(0.6),
-                      fontSize: 15,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.96,
+                      height: 1.1,
+                      foreground: Paint()
+                        ..shader = LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFFFFFFFF), Color(0xFFD3E2FF)],
+                        ).createShader(Rect.fromLTWH(0, 0, 200, 70)),
+                      fontFamily: 'Inter',
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+                const SizedBox(height: 6),
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    _getFormattedDate(), // Use your dynamic date
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: -0.16,
+                      color: Color(0xFF8A9BB5),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Container(
+                    height: 120,
+                    width: 360,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 28,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.cardDark,
+                      borderRadius: BorderRadius.circular(50.0),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          _fullWeatherData != null
+                              ? '${_fullWeatherData!.temperature.toStringAsFixed(1)}°'
+                              : '7.5°',
+                          style: TextStyle(
+                            fontSize: 78,
+                            fontWeight: FontWeight.w500, // Medium weight (500)
+                            fontFamily:
+                                'SpaceGrotesk', // Must add to pubspec.yaml
+                            height: 1.0, // line-height: 1
+                            letterSpacing: -4.0, // -4px letter spacing
+                            foreground: Paint()
+                              ..shader =
+                                  LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: const [
+                                      Color(0xFFFFFFFF), // White
+                                      Color(0xFFB8CCF0), // Soft blue
+                                    ],
+                                    stops: const [
+                                      0.3,
+                                      1.0,
+                                    ], // 30% white, 100% blue
+                                  ).createShader(
+                                    const Rect.fromLTWH(0, 0, 200, 100),
+                                  ),
+                          ),
+                        ),
+                        Container(
+                          height: 80,
+                          // width: 120, // Remove fixed width - let it size to content
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 28,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(
+                              0xFF121820,
+                            ).withOpacity(0.75), // Card Dark with 75% opacity
+                            borderRadius: BorderRadius.circular(40.0),
+                            border: Border.all(
+                              color: const Color(0xFF58C4FF).withOpacity(
+                                0.25,
+                              ), // Bright blue with 25% opacity
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(
+                                  0xFF002864,
+                                ).withOpacity(0.5), // Dark blue shadow
+                                offset: const Offset(0, 8),
+                                blurRadius: 12,
+                                spreadRadius:
+                                    -8, // Negative spread = smaller shadow
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize:
+                                MainAxisSize.min, // Shrink to fit content
+                            children: [
+                              const Text('☁️', style: TextStyle(fontSize: 24)),
+                              // const SizedBox(width: 8),
+                              Column(
+                                children: [
+                                  Text(
+                                    _fullWeatherData?.weatherDescription ??
+                                        'overcast',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(
+                                        0xFFD6EAFF,
+                                      ), // Light blue white
+                                      fontFamily: 'Inter',
+                                    ),
+                                  ),
+                                  Text(
+                                    _fullWeatherData?.weatherDescription ??
+                                        'clouds',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(
+                                        0xFFD6EAFF,
+                                      ), // Light blue white
+                                      fontFamily: 'Inter',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Container(
+                        //   height: 60,
+                        //   width: 120,
+                        //   decoration: BoxDecoration(
+                        //     color: AppColors.steelBlue,
+                        //     borderRadius: BorderRadius.circular(50.0),
+                        //   ),
+                        // ),
+                      ],
+                    ),
+                  ),
+                ),
+                _precidWidget('precip', 'no rain', 0, 'skyType'),
+              ],
+            ), // Spacing from top
+          ],
         ),
-        leading: const Icon(Icons.more_vert),
-        actions: const [Icon(Icons.add)],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              _fullWeatherData != null
-                  ? '${_fullWeatherData!.temperature.toStringAsFixed(1)}°'
-                  : '--°',
-              style: TextStyle(
-                color: const Color.fromARGB(255, 25, 113, 245).withOpacity(0.6),
-                fontSize: 120,
-              ),
+
+      // body: Center(
+      //   child: Column(
+      //     // mainAxisAlignment: MainAxisAlignment.start,
+      //     children: [
+      //       Row(
+      //         // mainAxisAlignment: MainAxisAlignment.end,
+      //         children: [
+      //           Column(
+      //             mainAxisAlignment: MainAxisAlignment.start,
+      //             children: [
+      //               Text(
+      //                 _fullWeatherData?.locationName ?? 'Kosino',
+      //                 style: TextStyle(
+      //                   fontSize: 32,
+      //                   fontWeight: FontWeight.w500,
+      //                   letterSpacing: -0.96,
+      //                   height: 1.1,
+      //                   foreground: Paint()
+      //                     ..shader = LinearGradient(
+      //                       begin: Alignment.topLeft,
+      //                       end: Alignment.bottomRight,
+      //                       colors: [Color(0xFFFFFFFF), Color(0xFFD3E2FF)],
+      //                     ).createShader(Rect.fromLTWH(0, 0, 200, 70)),
+      //                   fontFamily: 'Inter', // or 'SF Pro'
+      //                 ),
+      //               ),
+      //               Text(
+      //                 'Tuesday, 10 March 2026 · 18:24',
+      //                 style: TextStyle(
+      //                   fontSize: 16,
+      //                   fontWeight: FontWeight.w400,
+      //                   letterSpacing: -0.16,
+      //                   color: Color(0xFF8A9BB5),
+      //                   fontFamily: 'Inter', // or 'SF Pro'
+      //                 ),
+      //               ),
+      //             ],
+      //           ),
+      //         ],
+      //       ),
+      //       Text(
+      //         _fullWeatherData != null
+      //             ? '${_fullWeatherData!.temperature.toStringAsFixed(1)}°'
+      //             : '--°',
+      //         style: TextStyle(
+      //           color: const Color.fromARGB(255, 25, 113, 245).withOpacity(0.6),
+      //           fontSize: 120,
+      //         ),
+      //       ),
+      //       Row(
+      //         mainAxisAlignment: MainAxisAlignment.center,
+      //         children: [
+      //           Text(
+      //             _fullWeatherData?.weatherDescription ?? '--',
+      //             style: TextStyle(
+      //               color: const Color.fromARGB(
+      //                 255,
+      //                 113,
+      //                 86,
+      //                 246,
+      //               ).withOpacity(0.6),
+      //               fontSize: 25,
+      //             ),
+      //           ),
+      //           const SizedBox(width: 16),
+      //           const Icon(
+      //             Icons.cloud,
+      //             color: Color.fromARGB(255, 112, 184, 244),
+      //             size: 80.0,
+      //           ),
+      //         ],
+      //       ),
+      //       const SizedBox(height: 20),
+      //       Container(
+      //         height: 120,
+      //         width: 360,
+      //         decoration: BoxDecoration(
+      //           color: const Color.fromARGB(255, 255, 250, 250),
+      //           borderRadius: BorderRadius.circular(50.0),
+      //         ),
+      //         child: Center(
+      //           child: Row(
+      //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      //             children: [
+      //               _buildWeatherStat(
+      //                 icon: Icons.umbrella_outlined,
+      //                 value: _fullWeatherData?.precipitation,
+      //                 unit: '%',
+      //                 label: 'Precipitation',
+      //               ),
+      //               _buildWeatherStat(
+      //                 icon: Icons.water_drop,
+      //                 value: _fullWeatherData?.humidity,
+      //                 unit: '%',
+      //                 label: 'Humidity',
+      //               ),
+      //               _buildWeatherStat(
+      //                 icon: Icons.air,
+      //                 value: _fullWeatherData?.windSpeed,
+      //                 unit: 'km/h',
+      //                 label: 'Wind Speed',
+      //               ),
+      //             ],
+      //           ),
+      //         ),
+      //       ),
+      //     ],
+      //   ),
+      // ),
+    );
+  }
+
+  Widget _precidWidget(precip, rainStatus, waterLevel, skyType) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Container(
+        height: 180,
+        width: 180,
+        // width: 120, // Remove fixed width - let it size to content
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(
+            0xFF121820,
+          ).withOpacity(0.75), // Card Dark with 75% opacity
+          borderRadius: BorderRadius.circular(40.0),
+          border: Border.all(
+            color: const Color(
+              0xFF58C4FF,
+            ).withOpacity(0.25), // Bright blue with 25% opacity
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(
+                0xFF002864,
+              ).withOpacity(0.5), // Dark blue shadow
+              offset: const Offset(0, 8),
+              blurRadius: 12,
+              spreadRadius: -8, // Negative spread = smaller shadow
             ),
+          ],
+        ),
+        child: Column(
+          children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  _fullWeatherData?.weatherDescription ?? '--',
-                  style: TextStyle(
-                    color: const Color.fromARGB(
-                      255,
-                      113,
-                      86,
-                      246,
-                    ).withOpacity(0.6),
-                    fontSize: 25,
+                  '💧',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFFD6EAFF), // Light blue white
+                    fontFamily: 'Inter',
                   ),
                 ),
-                const SizedBox(width: 16),
-                const Icon(
-                  Icons.cloud,
-                  color: Color.fromARGB(255, 112, 184, 244),
-                  size: 80.0,
+                Text(
+                  'PRECIP',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFFD6EAFF), // Light blue white
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ],
-            ),
-            const SizedBox(height: 20),
-            Container(
-              height: 120,
-              width: 360,
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 255, 250, 250),
-                borderRadius: BorderRadius.circular(50.0),
-              ),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildWeatherStat(
-                      icon: Icons.umbrella_outlined,
-                      value: _fullWeatherData?.precipitation,
-                      unit: '%',
-                      label: 'Precipitation',
-                    ),
-                    _buildWeatherStat(
-                      icon: Icons.water_drop,
-                      value: _fullWeatherData?.humidity,
-                      unit: '%',
-                      label: 'Humidity',
-                    ),
-                    _buildWeatherStat(
-                      icon: Icons.air,
-                      value: _fullWeatherData?.windSpeed,
-                      unit: 'km/h',
-                      label: 'Wind Speed',
-                    ),
-                  ],
-                ),
-              ),
             ),
           ],
         ),

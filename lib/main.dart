@@ -41,7 +41,7 @@ Future<WeatherData> getWeather(double lat, double lon) async {
   final response = await http.get(Uri.parse(url));
   final data = json.decode(response.body);
 
-  print("DATA =  $data");
+  // print("DATA =  $data");
 
   final WeatherData weatherData = (
     temperature: (data['main']['temp'] as num).toDouble(),
@@ -173,7 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Text(
-                    _fullWeatherData?.locationName ?? 'Kosino',
+                    _fullWeatherData?.locationName ?? 'Loading...',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w500,
@@ -205,12 +205,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 const SizedBox(height: 30),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Container(
                     height: 120,
-                    width: 360,
+                    width: 380,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 28,
+                      horizontal: 10,
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
@@ -221,10 +221,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       children: [
                         Row(
                           children: [
+                            const SizedBox(width: 5),
                             Text(
                               _fullWeatherData != null
                                   ? '${_fullWeatherData!.temperature.toStringAsFixed(1)}°'
-                                  : '7.5',
+                                  : '22.5',
                               style: TextStyle(
                                 fontSize: 78,
                                 fontWeight:
@@ -279,11 +280,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                       ),
                               ),
                             ),
+                            const SizedBox(width: 15),
                             Container(
                               height: 80,
                               // width: 120, // Remove fixed width - let it size to content
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 28,
+                                horizontal: 20,
                                 vertical: 10,
                               ),
                               decoration: BoxDecoration(
@@ -366,116 +368,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-
-      // body: Center(
-      //   child: Column(
-      //     // mainAxisAlignment: MainAxisAlignment.start,
-      //     children: [
-      //       Row(
-      //         // mainAxisAlignment: MainAxisAlignment.end,
-      //         children: [
-      //           Column(
-      //             mainAxisAlignment: MainAxisAlignment.start,
-      //             children: [
-      //               Text(
-      //                 _fullWeatherData?.locationName ?? 'Kosino',
-      //                 style: TextStyle(
-      //                   fontSize: 32,
-      //                   fontWeight: FontWeight.w500,
-      //                   letterSpacing: -0.96,
-      //                   height: 1.1,
-      //                   foreground: Paint()
-      //                     ..shader = LinearGradient(
-      //                       begin: Alignment.topLeft,
-      //                       end: Alignment.bottomRight,
-      //                       colors: [Color(0xFFFFFFFF), Color(0xFFD3E2FF)],
-      //                     ).createShader(Rect.fromLTWH(0, 0, 200, 70)),
-      //                   fontFamily: 'Inter', // or 'SF Pro'
-      //                 ),
-      //               ),
-      //               Text(
-      //                 'Tuesday, 10 March 2026 · 18:24',
-      //                 style: TextStyle(
-      //                   fontSize: 16,
-      //                   fontWeight: FontWeight.w400,
-      //                   letterSpacing: -0.16,
-      //                   color: Color(0xFF8A9BB5),
-      //                   fontFamily: 'Inter', // or 'SF Pro'
-      //                 ),
-      //               ),
-      //             ],
-      //           ),
-      //         ],
-      //       ),
-      //       Text(
-      //         _fullWeatherData != null
-      //             ? '${_fullWeatherData!.temperature.toStringAsFixed(1)}°'
-      //             : '--°',
-      //         style: TextStyle(
-      //           color: const Color.fromARGB(255, 25, 113, 245).withOpacity(0.6),
-      //           fontSize: 120,
-      //         ),
-      //       ),
-      //       Row(
-      //         mainAxisAlignment: MainAxisAlignment.center,
-      //         children: [
-      //           Text(
-      //             _fullWeatherData?.weatherDescription ?? '--',
-      //             style: TextStyle(
-      //               color: const Color.fromARGB(
-      //                 255,
-      //                 113,
-      //                 86,
-      //                 246,
-      //               ).withOpacity(0.6),
-      //               fontSize: 25,
-      //             ),
-      //           ),
-      //           const SizedBox(width: 16),
-      //           const Icon(
-      //             Icons.cloud,
-      //             color: Color.fromARGB(255, 112, 184, 244),
-      //             size: 80.0,
-      //           ),
-      //         ],
-      //       ),
-      //       const SizedBox(height: 20),
-      //       Container(
-      //         height: 120,
-      //         width: 360,
-      //         decoration: BoxDecoration(
-      //           color: const Color.fromARGB(255, 255, 250, 250),
-      //           borderRadius: BorderRadius.circular(50.0),
-      //         ),
-      //         child: Center(
-      //           child: Row(
-      //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      //             children: [
-      //               _buildWeatherStat(
-      //                 icon: Icons.umbrella_outlined,
-      //                 value: _fullWeatherData?.precipitation,
-      //                 unit: '%',
-      //                 label: 'Precipitation',
-      //               ),
-      //               _buildWeatherStat(
-      //                 icon: Icons.water_drop,
-      //                 value: _fullWeatherData?.humidity,
-      //                 unit: '%',
-      //                 label: 'Humidity',
-      //               ),
-      //               _buildWeatherStat(
-      //                 icon: Icons.air,
-      //                 value: _fullWeatherData?.windSpeed,
-      //                 unit: 'km/h',
-      //                 label: 'Wind Speed',
-      //               ),
-      //             ],
-      //           ),
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
     );
   }
 
@@ -591,6 +483,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   fontFamily: 'Inter',
                 ),
               ),
+              SizedBox(height: 15),
               Row(
                 children: [
                   Text(
@@ -729,7 +622,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 35),
               LinearProgressIndicator(
                 value: dewPoint / 10, // Value between 0.0 and 1.0
               ),

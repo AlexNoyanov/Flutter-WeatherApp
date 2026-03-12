@@ -538,6 +538,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
+            Text(
+              '50%',
+              style: TextStyle(
+                fontSize: 50,
+                fontWeight: FontWeight.w500, // Medium weight (500)
+                fontFamily: 'SpaceGrotesk', // Must add to pubspec.yaml
+                height: 1.0, // line-height: 1
+                letterSpacing: -4.0, // -4px letter spacing
+                foreground: Paint()
+                  ..shader = LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: const [
+                      Color(0xFFFFFFFF), // White
+                      Color(0xFFB8CCF0), // Soft blue
+                    ],
+                    stops: const [0.3, 1.0], // 30% white, 100% blue
+                  ).createShader(const Rect.fromLTWH(0, 0, 200, 100)),
+              ),
+            ),
           ],
         ),
       ),

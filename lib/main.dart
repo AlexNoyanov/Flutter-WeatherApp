@@ -18,6 +18,20 @@ class AppColors {
   // Add all colors from my previous list
 }
 
+List<Color> getTempGradient(double temp) {
+  if (temp <= 0) {
+    return [Colors.blue.shade700, Colors.cyan.shade400];
+  } else if (temp <= 10) {
+    return [Colors.cyan, Colors.green];
+  } else if (temp <= 20) {
+    return [Colors.green, Colors.yellow];
+  } else if (temp <= 30) {
+    return [Colors.orange, Colors.deepOrange];
+  } else {
+    return [Colors.red, Colors.deepOrange];
+  }
+}
+
 // Color	Hex	Where to Use
 // Deep Space	#0A0E14	Main app background (scaffold backgroundColor)
 // Card Dark	#121820 (75% opacity)	Main weather card - the big rounded container
@@ -31,6 +45,7 @@ typedef WeatherData = ({
   double windSpeed,
   String locationName,
   DateTime currentDate,
+  String feelsLike,
 });
 
 Future<WeatherData> getWeather(double lat, double lon) async {
@@ -42,7 +57,7 @@ Future<WeatherData> getWeather(double lat, double lon) async {
   final response = await http.get(Uri.parse(url));
   final data = json.decode(response.body);
 
-  // print("DATA =  $data");
+  print("DATA =  $data");
 
   final WeatherData weatherData = (
     temperature: (data['main']['temp'] as num).toDouble(),
@@ -52,6 +67,7 @@ Future<WeatherData> getWeather(double lat, double lon) async {
     windSpeed: (data['wind']['speed'] as num).toDouble(),
     locationName: data['name'] as String? ?? 'Unknown',
     currentDate: DateTime.now(),
+    feelsLike: (data['main']['feels_like'] as num) as String,
   );
 
   return weatherData;
@@ -153,7 +169,10 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 20),
-              Text('Fetching weather data...'),
+              Text(
+                'Fetching weather data...',
+                style: TextStyle(color: Colors.orange),
+              ),
             ],
           ),
         ),
@@ -163,6 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: AppColors.deepSpace,
       appBar: AppBar(backgroundColor: AppColors.deepSpace),
+
       body: Container(
         width: double.infinity,
         color: AppColors.deepSpace,
@@ -210,82 +230,177 @@ class _MyHomePageState extends State<MyHomePage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Container(
-                    height: 120,
+                    height: 140,
                     width: 380,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.cardDark,
-                      borderRadius: BorderRadius.circular(50.0),
+                      color: const Color(
+                        0xFF121820,
+                      ).withOpacity(0.75), // Card Dark with 75% opacity
+                      borderRadius: BorderRadius.circular(40.0),
+                      border: Border.all(
+                        color: const Color(
+                          0xFF58C4FF,
+                        ).withOpacity(0.25), // Bright blue with 25% opacity
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(
+                            0xFF002864,
+                          ).withOpacity(0.5), // Dark blue shadow
+                          offset: const Offset(0, 8),
+                          blurRadius: 12,
+                          spreadRadius: -8, // Negative spread = smaller shadow
+                        ),
+                      ],
                     ),
+                    // decoration: BoxDecoration(
+                    //   color: AppColors.cardDark,
+                    //   borderRadius: BorderRadius.circular(50.0),
+
+                    //   // gradient: LinearGradient(
+                    //   //   colors: [
+                    //   //     lerpTempColor(_fullWeatherData!.temperature),
+                    //   //     lerpTempColor(_fullWeatherData!.temperature + 5),
+                    //   //   ],
+                    //   // ),
+                    // ),
                     child: Row(
                       children: [
                         Row(
                           children: [
                             const SizedBox(width: 5),
-                            Text(
-                              _fullWeatherData != null
-                                  ? '${_fullWeatherData!.temperature.toStringAsFixed(1)}°'
-                                  : '...',
-                              style: TextStyle(
-                                fontSize: 78,
-                                fontWeight:
-                                    FontWeight.w500, // Medium weight (500)
-                                fontFamily:
-                                    'SpaceGrotesk', // Must add to pubspec.yaml
-                                height: 1.0, // line-height: 1
-                                letterSpacing: -4.0, // -4px letter spacing
-                                foreground: Paint()
-                                  ..shader =
-                                      LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: const [
-                                          Color(0xFFFFFFFF), // White
-                                          Color(0xFFB8CCF0), // Soft blue
-                                        ],
-                                        stops: const [
-                                          0.3,
-                                          1.0,
-                                        ], // 30% white, 100% blue
-                                      ).createShader(
-                                        const Rect.fromLTWH(0, 0, 200, 100),
+                            Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      _fullWeatherData != null
+                                          ? '${_fullWeatherData!.temperature.toStringAsFixed(1)}°'
+                                          : '...',
+                                      style: TextStyle(
+                                        color: lerpTempColor(
+                                          _fullWeatherData?.temperature ?? 0,
+                                        ), // ← solid color
+                                        fontSize: 78,
+                                        fontWeight: FontWeight
+                                            .w500, // Medium weight (500)
+                                        fontFamily:
+                                            'SpaceGrotesk', // Must add to pubspec.yaml
+                                        height: 1.0, // line-height: 1
+                                        letterSpacing:
+                                            -4.0, // -4px letter spacing
+                                        //       foreground: Paint()
+                                        //         ..shader =
+                                        //             LinearGradient(
+                                        //               begin: Alignment.topCenter,
+                                        //               end: Alignment.bottomCenter,
+                                        // //                const [Color(lerpTempColor(_fullWeatherData!.temperature)),
+                                        // // Color(lerpTempColor(_fullWeatherData!.temperature + 5)),
+                                        //               //  ]
+                                        //               //  const [
+                                        //               //   Color(0xFFFFFFFF), // White
+                                        //               //   Color(0xFFB8CCF0), // Soft blue
+                                        //               // ],
+                                        //               stops: const [
+                                        //                 0.3,
+                                        //                 1.0,
+                                        //               ], // 30% white, 100% blue
+                                        //             ).createShader(
+                                        //               const Rect.fromLTWH(0, 0, 200, 100),
+                                        //             ),
                                       ),
-                              ),
-                            ),
-                            Text(
-                              '°C',
-                              style: TextStyle(
-                                fontSize: 40,
-                                fontWeight:
-                                    FontWeight.w500, // Medium weight (500)
-                                fontFamily:
-                                    'SpaceGrotesk', // Must add to pubspec.yaml
-                                height: 1.0, // line-height: 1
-                                letterSpacing: -4.0, // -4px letter spacing
-                                foreground: Paint()
-                                  ..shader =
-                                      LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: const [
-                                          Color(0xFFFFFFFF), // White
-                                          Color(0xFFB8CCF0), // Soft blue
-                                        ],
-                                        stops: const [
-                                          0.3,
-                                          1.0,
-                                        ], // 30% white, 100% blue
-                                      ).createShader(
-                                        const Rect.fromLTWH(0, 0, 200, 100),
+                                    ),
+                                    Text(
+                                      'C',
+                                      style: TextStyle(
+                                        fontSize: 40,
+                                        fontWeight: FontWeight
+                                            .w500, // Medium weight (500)
+                                        fontFamily:
+                                            'SpaceGrotesk', // Must add to pubspec.yaml
+                                        height: 1.0, // line-height: 1
+                                        letterSpacing:
+                                            -4.0, // -4px letter spacing
+                                        color: lerpTempColor(
+                                          _fullWeatherData!.temperature,
+                                        ), // ← solid color
+                                        // foreground: Paint()
+                                        //   ..shader =
+                                        //       LinearGradient(
+                                        //         begin: Alignment.topCenter,
+                                        //         end: Alignment.bottomCenter,
+                                        //         colors: const [
+                                        //           Color(0xFFFFFFFF), // White
+                                        //           Color(0xFFB8CCF0), // Soft blue
+                                        //         ],
+                                        //         stops: const [
+                                        //           0.3,
+                                        //           1.0,
+                                        //         ], // 30% white, 100% blue
+                                        //       ).createShader(
+                                        //         const Rect.fromLTWH(0, 0, 200, 100),
+                                        //       ),
                                       ),
-                              ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      'feels like ',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        letterSpacing: -0.16,
+                                        color: Color(0xFF8A9BB5),
+                                        fontFamily: 'Inter',
+                                      ),
+                                    ),
+                                    Text(
+                                      _fullWeatherData?.feelsLike ?? '...',
+                                      style: TextStyle(
+                                        fontSize: 40,
+                                        fontWeight: FontWeight
+                                            .w500, // Medium weight (500)
+                                        fontFamily:
+                                            'SpaceGrotesk', // Must add to pubspec.yaml
+                                        height: 1.0, // line-height: 1
+                                        letterSpacing:
+                                            -4.0, // -4px letter spacing
+                                        color: lerpTempColor(
+                                          _fullWeatherData?.temperature ?? 0,
+                                        ), // ← solid color
+                                        // foreground: Paint()
+                                        //   ..shader =
+                                        //       LinearGradient(
+                                        //         begin: Alignment.topCenter,
+                                        //         end: Alignment.bottomCenter,
+                                        //         colors: const [
+                                        //           Color(0xFFFFFFFF), // White
+                                        //           Color(0xFFB8CCF0), // Soft blue
+                                        //         ],
+                                        //         stops: const [
+                                        //           0.3,
+                                        //           1.0,
+                                        //         ], // 30% white, 100% blue
+                                        //       ).createShader(
+                                        //         const Rect.fromLTWH(0, 0, 200, 100),
+                                        //       ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                             const SizedBox(width: 15),
                             Container(
                               height: 80,
+                              width: 140,
                               // width: 120, // Remove fixed width - let it size to content
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 20,
@@ -325,18 +440,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   const SizedBox(width: 8),
                                   Column(
                                     children: [
-                                      // Text(
-                                      //   _fullWeatherData?.weatherDescription ??
-                                      //       '...',
-                                      //   style: const TextStyle(
-                                      //     fontSize: 18,
-                                      //     fontWeight: FontWeight.w500,
-                                      //     color: Color(
-                                      //       0xFFD6EAFF,
-                                      //     ), // Light blue white
-                                      //     fontFamily: 'Inter',
-                                      //   ),
-                                      // ),
+                                      const SizedBox(height: 5),
                                       _splitedTextColumn(
                                         _fullWeatherData?.weatherDescription ??
                                             '...',
@@ -352,11 +456,16 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 Row(
                   children: [
-                    _precidWidget('50', 'no rain', '0', 'skyType'),
-                    _humidityWidget('69', 3.2),
+                    _precidWidget(
+                      _fullWeatherData?.precipitation,
+                      _fullWeatherData?.weatherDescription,
+                      '0',
+                      'skyType',
+                    ),
+                    _humidityWidget(_fullWeatherData?.humidity, 3.2),
                   ],
                 ),
               ],
@@ -390,7 +499,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _precidWidget(precip, rainStatus, waterLevel, skyType) {
     return Padding(
-      padding: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(5.0),
       child: Container(
         height: 180,
         width: 180,
@@ -539,7 +648,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _humidityWidget(humidity, double dewPoint) {
     return Padding(
-      padding: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(5.0),
       child: Container(
         height: 180,
         width: 180,
@@ -685,6 +794,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  // Widget _windWidget()
+
   Widget _appLoadingAnimation() {
     return Column(
       children: [
@@ -709,5 +820,11 @@ class _MyHomePageState extends State<MyHomePage> {
         Text(label, style: const TextStyle(fontSize: 12)),
       ],
     );
+  }
+
+  Color lerpTempColor(double temp) {
+    double t = ((temp + 20) / 60).clamp(0, 1);
+
+    return Color.lerp(Colors.blue, Colors.red, t)!;
   }
 }

@@ -505,7 +505,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _precidWidget(precip, rainStatus, waterLevel, skyType) {
     return Padding(
-      padding: EdgeInsets.all(5.0),
+      padding: EdgeInsets.all(10.0),
       child: Container(
         height: 180,
         width: 180,
@@ -654,7 +654,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _humidityWidget(double? humidity, double dewPoint) {
     return Padding(
-      padding: EdgeInsets.all(5.0),
+      padding: EdgeInsets.all(10.0),
       child: Container(
         height: 180,
         width: 180,

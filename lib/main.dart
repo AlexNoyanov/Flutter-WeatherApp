@@ -45,7 +45,7 @@ typedef WeatherData = ({
   double windSpeed,
   String locationName,
   DateTime currentDate,
-  String feelsLike,
+  double feelsLike,
 });
 
 Future<WeatherData> getWeather(double lat, double lon) async {
@@ -67,7 +67,7 @@ Future<WeatherData> getWeather(double lat, double lon) async {
     windSpeed: (data['wind']['speed'] as num).toDouble(),
     locationName: data['name'] as String? ?? 'Unknown',
     currentDate: DateTime.now(),
-    feelsLike: (data['main']['feels_like'] as num) as String,
+    feelsLike: (data['main']['feels_like'] as num).toDouble(),
   );
 
   return weatherData;
@@ -119,11 +119,27 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       // Step 1: Get current location
       print('Getting location...');
-      final position = await LocationService.getCurrentLocation();
+      Position position;
+      try {
+        position = await LocationService.getCurrentLocation();
+        print('Location obtained: ${position.latitude}, ${position.longitude}');
+      } catch (e) {
+        print('Location error: $e. Using default location.');
+        // Fallback to a default location (San Francisco)
+        position = Position(
+          latitude: 37.7749,
+          longitude: -122.4194,
+          timestamp: DateTime.now(),
+          accuracy: 0,
+          altitude: 0,
+          heading: 0,
+          speed: 0,
+          speedAccuracy: 0,
+          altitudeAccuracy: 0,
+          headingAccuracy: 0,
+        );
+      }
 
-      print('Location obtained: ${position.latitude}, ${position.longitude}');
-
-      // final weatherData = await getWeather(55.731028, 37.857556);
       final weatherData = await getWeather(
         position.latitude,
         position.longitude,
@@ -258,17 +274,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ],
                     ),
-                    // decoration: BoxDecoration(
-                    //   color: AppColors.cardDark,
-                    //   borderRadius: BorderRadius.circular(50.0),
-
-                    //   // gradient: LinearGradient(
-                    //   //   colors: [
-                    //   //     lerpTempColor(_fullWeatherData!.temperature),
-                    //   //     lerpTempColor(_fullWeatherData!.temperature + 5),
-                    //   //   ],
-                    //   // ),
-                    // ),
                     child: Row(
                       children: [
                         Row(
@@ -327,7 +332,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         letterSpacing:
                                             -4.0, // -4px letter spacing
                                         color: lerpTempColor(
-                                          _fullWeatherData!.temperature,
+                                          _fullWeatherData?.temperature ?? 0,
                                         ), // ← solid color
                                         // foreground: Paint()
                                         //   ..shader =
@@ -362,7 +367,24 @@ class _MyHomePageState extends State<MyHomePage> {
                                       ),
                                     ),
                                     Text(
-                                      _fullWeatherData?.feelsLike ?? '...',
+                                      (_fullWeatherData?.feelsLike ?? 0)
+                                          .toString(),
+                                      style: TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight
+                                            .w500, // Medium weight (500)
+                                        fontFamily:
+                                            'SpaceGrotesk', // Must add to pubspec.yaml
+                                        height: 1.0, // line-height: 1
+                                        letterSpacing:
+                                            -4.0, // -4px letter spacing
+                                        color: lerpTempColor(
+                                          _fullWeatherData?.feelsLike ?? 0,
+                                        ), // ← solid color
+                                      ),
+                                    ),
+                                    Text(
+                                      '°C',
                                       style: TextStyle(
                                         fontSize: 40,
                                         fontWeight: FontWeight
@@ -375,29 +397,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                         color: lerpTempColor(
                                           _fullWeatherData?.temperature ?? 0,
                                         ), // ← solid color
-                                        // foreground: Paint()
-                                        //   ..shader =
-                                        //       LinearGradient(
-                                        //         begin: Alignment.topCenter,
-                                        //         end: Alignment.bottomCenter,
-                                        //         colors: const [
-                                        //           Color(0xFFFFFFFF), // White
-                                        //           Color(0xFFB8CCF0), // Soft blue
-                                        //         ],
-                                        //         stops: const [
-                                        //           0.3,
-                                        //           1.0,
-                                        //         ], // 30% white, 100% blue
-                                        //       ).createShader(
-                                        //         const Rect.fromLTWH(0, 0, 200, 100),
-                                        //       ),
                                       ),
                                     ),
                                   ],
                                 ),
                               ],
                             ),
-                            const SizedBox(width: 15),
+                            const SizedBox(width: 10),
                             Container(
                               height: 80,
                               width: 140,
@@ -600,7 +606,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
               Text(
-                rainStatus, // Use your dynamic date
+                rainStatus ?? '...', // Use your dynamic date
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
@@ -646,7 +652,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _humidityWidget(humidity, double dewPoint) {
+  Widget _humidityWidget(double? humidity, double dewPoint) {
     return Padding(
       padding: EdgeInsets.all(5.0),
       child: Container(

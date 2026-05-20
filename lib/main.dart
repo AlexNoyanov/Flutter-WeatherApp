@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'weather_api.dart';
 
 // ==================== COLORS ====================
 class AppColors {
@@ -20,48 +20,6 @@ class AppColors {
   static const Color dimBlue = Color(0xFF6D88AA);
   static const Color deepBlueGray = Color(0xFF3F5679);
   static const Color mediumBlueGray = Color(0xFF9FB0D0);
-}
-
-// ==================== WEATHER DATA TYPEDEF ====================
-typedef WeatherData = ({
-  double temperature,
-  double feelsLike,
-  double humidity,
-  String weatherDescription,
-  double precipitation,
-  double windSpeed,
-  String locationName,
-  DateTime currentDate,
-});
-
-// ==================== API CALL ====================
-Future<WeatherData> getWeather(double lat, double lon) async {
-  print('=== GETTING WEATHER UPDATE ===');
-  final apiKey = dotenv.env['OPENWEATHER_API_KEY'] ?? '';
-  // Construct URL using your base URL and API key
-  final url =
-      'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey&units=metric';
-
-  final response = await http.get(Uri.parse(url));
-  if (response.statusCode != 200) {
-    throw Exception('Failed to load weather');
-  }
-  final data = json.decode(response.body);
-
-  print("DATA = $data");
-
-  final WeatherData weatherData = (
-    temperature: (data['main']['temp'] as num).toDouble(),
-    feelsLike: (data['main']['feels_like'] as num).toDouble(),
-    humidity: (data['main']['humidity'] as num).toDouble(),
-    weatherDescription: data['weather'][0]['description'] as String,
-    precipitation: ((data['rain']?['1h'] ?? 0.0) as num).toDouble(),
-    windSpeed: (data['wind']['speed'] as num).toDouble(),
-    locationName: data['name'] as String? ?? 'Unknown',
-    currentDate: DateTime.now(),
-  );
-
-  return weatherData;
 }
 
 // ==================== MAIN ====================
@@ -99,13 +57,36 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   WeatherData? _fullWeatherData;
+  WeatherMeta? _weatherMeta;
   bool _isLoading = true;
   String? _errorMessage;
+
+  bool _useEarth = true;
+  String _planet = 'mars';
+  String _side = 'bright';
+  List<String> _planets = const ['mars', 'moon', 'venus', 'mercury', 'jupiter'];
 
   @override
   void initState() {
     super.initState();
-    _loadWeatherData();
+    _initPlanetsAndWeather();
+  }
+
+  Future<void> _initPlanetsAndWeather() async {
+    try {
+      final supported = await fetchSupportedPlanets();
+      if (mounted) {
+        setState(() {
+          _planets = supported.planets;
+          if (!_planets.contains(_planet)) {
+            _planet = _planets.first;
+          }
+        });
+      }
+    } catch (_) {
+      // Worker offline — keep default planet list
+    }
+    await _loadWeatherData();
   }
 
   Future<void> _loadWeatherData() async {
@@ -115,18 +96,21 @@ class _MyHomePageState extends State<MyHomePage> {
         _errorMessage = null;
       });
 
-      // Get current location
-      final position = await _getCurrentLocation();
-
-      // Fetch weather
-      final weatherData = await getWeather(
-        position.latitude,
-        position.longitude,
-      );
+      final WeatherResult result;
+      if (_useEarth) {
+        final position = await _getCurrentLocation();
+        result = await getEarthWeather(
+          position.latitude,
+          position.longitude,
+        );
+      } else {
+        result = await getPlanetWeather(_planet, _side);
+      }
 
       if (mounted) {
         setState(() {
-          _fullWeatherData = weatherData;
+          _fullWeatherData = result.data;
+          _weatherMeta = result.meta;
           _isLoading = false;
         });
       }
@@ -139,6 +123,116 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       }
     }
+  }
+
+  void _onLocationModeChanged(bool useEarth) {
+    if (_useEarth == useEarth) return;
+    setState(() => _useEarth = useEarth);
+    _loadWeatherData();
+  }
+
+  Widget _buildLocationSelector() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SegmentedButton<bool>(
+            segments: const [
+              ButtonSegment(value: true, label: Text('Earth')),
+              ButtonSegment(value: false, label: Text('Planet')),
+            ],
+            selected: {_useEarth},
+            onSelectionChanged: (set) => _onLocationModeChanged(set.first),
+            style: ButtonStyle(
+              foregroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return AppColors.deepSpace;
+                }
+                return AppColors.steelBlue;
+              }),
+              backgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return AppColors.brightBlue;
+                }
+                return AppColors.cardDark.withOpacity(0.6);
+              }),
+            ),
+          ),
+          if (!_useEarth) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: _planet,
+                    dropdownColor: AppColors.cardDark,
+                    decoration: InputDecoration(
+                      labelText: 'Planet',
+                      labelStyle: const TextStyle(color: AppColors.steelBlue),
+                      filled: true,
+                      fillColor: AppColors.cardDark.withOpacity(0.5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    items: _planets
+                        .map(
+                          (p) => DropdownMenuItem(
+                            value: p,
+                            child: Text(
+                              p[0].toUpperCase() + p.substring(1),
+                              style: const TextStyle(color: AppColors.pureWhite),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setState(() => _planet = value);
+                      _loadWeatherData();
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: _side,
+                    dropdownColor: AppColors.cardDark,
+                    decoration: InputDecoration(
+                      labelText: 'Side',
+                      labelStyle: const TextStyle(color: AppColors.steelBlue),
+                      filled: true,
+                      fillColor: AppColors.cardDark.withOpacity(0.5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'bright',
+                        child: Text('Bright', style: TextStyle(color: AppColors.pureWhite)),
+                      ),
+                      DropdownMenuItem(
+                        value: 'dark',
+                        child: Text('Dark', style: TextStyle(color: AppColors.pureWhite)),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setState(() => _side = value);
+                      _loadWeatherData();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
   }
 
   Future<Position> _getCurrentLocation() async {
@@ -199,25 +293,41 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_errorMessage != null || _fullWeatherData == null) {
       return Scaffold(
         backgroundColor: AppColors.deepSpace,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, color: Colors.red, size: 60),
-              const SizedBox(height: 16),
-              Text(
-                'Error: $_errorMessage',
-                style: const TextStyle(color: AppColors.steelBlue),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _loadWeatherData,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.brightBlue,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Column(
+              children: [
+                _buildLocationSelector(),
+                const SizedBox(height: 40),
+                const Icon(Icons.error_outline, color: Colors.red, size: 60),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Text(
+                    'Error: $_errorMessage',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: AppColors.steelBlue),
+                  ),
                 ),
-                child: const Text('Retry'),
-              ),
-            ],
+                const SizedBox(height: 12),
+                Text(
+                  'Worker: $weatherApiBase',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.dimBlue,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: _loadWeatherData,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.brightBlue,
+                  ),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -269,7 +379,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
+
+              _buildLocationSelector(),
+
+              const SizedBox(height: 20),
 
               // Location
               Padding(
@@ -277,6 +391,31 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (_weatherMeta != null &&
+                        (_weatherMeta!.isSimulated ||
+                            _weatherMeta!.note != null))
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.brightBlue.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            _weatherMeta!.isSimulated
+                                ? 'Modeled · ${_weatherMeta!.dataSource}'
+                                : _weatherMeta!.dataSource,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.lightBlue,
+                            ),
+                          ),
+                        ),
+                      ),
                     // Location name with gradient
                     ShaderMask(
                       shaderCallback: (bounds) => const LinearGradient(
